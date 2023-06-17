@@ -611,11 +611,24 @@ class DbusService:
         (power, pvyield, current, voltage, dc_voltage) = self.get_values_for_inverter()
 
         # This will be refactored later in classes
-        if self._servicename == "com.victronenergy.inverter":
+        if self._servicename == "com.victronenergy.inverter":  # and self.acposition != constants.ACPOSITION_AC_INPUT_1:
             self._dbusservice["/Ac/Out/L1/V"] = voltage
             self._dbusservice["/Ac/Out/L1/I"] = current
+            # seems not supported by Victron: self._dbusservice["/Ac/Out/L1/P"] = power
             self._dbusservice["/Dc/0/Voltage"] = dc_voltage
             self._dbusservice["/State"] = self.get_ac_inverter_state(current)
+
+            # Set Mode to 2 to show it as ON
+            # 2=On;4=Off;5=Eco
+            self._dbusservice["/Mode"] = 2
+            # set the SystemState flaf to 9=Inverting
+            # /SystemState/State     ->   0: Off
+            #                        ->   1: Low power
+            #                        ->   9: Inverting
+            if power is not None and power > 0:
+                self._dbusservice["/State"] = 9
+            else:
+                self._dbusservice["/State"] = 0
 
             logging.debug(f"Inverter #{self.pvinverternumber} Voltage (/Ac/Out/L1/V): {voltage}")
             logging.debug(f"Inverter #{self.pvinverternumber} Current (/Ac/Out/L1/I): {current}")
@@ -626,9 +639,21 @@ class DbusService:
             self._dbusservice[pre + "/Current"] = current
             self._dbusservice[pre + "/Power"] = power
             self._dbusservice["/Ac/Power"] = power
-            if power > 0:
+            if power is not None and power > 0:
                 self._dbusservice[pre + "/Energy/Forward"] = pvyield
                 self._dbusservice["/Ac/Energy/Forward"] = pvyield
+
+            # Set Mode to 2 to show it as ON
+            # 2=On;4=Off;5=Eco
+            self._dbusservice["/Mode"] = 2
+            # set the SystemState flaf to 9=Inverting
+            # /SystemState/State     ->   0: Off
+            #                        ->   1: Low power
+            #                        ->   9: Inverting
+            if power is not None and power > 0:
+                self._dbusservice["/State"] = 9
+            else:
+                self._dbusservice["/State"] = 0
 
             logging.debug(f"Inverter #{self.pvinverternumber} Power (/Ac/Power): {power}")
             logging.debug(f"Inverter #{self.pvinverternumber} Energy (/Ac/Energy/Forward): {pvyield}")
