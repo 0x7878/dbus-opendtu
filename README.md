@@ -71,7 +71,6 @@ chmod a+x /data/dbus-opendtu/*.sh
 cp /data/dbus-opendtu/config.example /data/dbus-opendtu/config.ini
 nano /data/dbus-opendtu/config.ini
 ```
-
 Tha last step is to install the service and remove the downloaded files:
 
 ```bash
