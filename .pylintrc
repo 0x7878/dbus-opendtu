@@ -12,6 +12,7 @@ fail-under=10.0
 # paths.
 ignore=CVS
 
+
 # Add files or directories matching the regex patterns to the blacklist. The
 # regex matches against base names, not paths.
 ignore-patterns=
